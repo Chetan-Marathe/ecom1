@@ -1,0 +1,17 @@
+package com.app.ecommerce.controller;
+
+import com.app.ecommerce.entity.Order;
+import com.app.ecommerce.service.Orderservice;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class OrderController {
+
+    @Autowired
+    private Orderservice orderservice;
+
+
+}
