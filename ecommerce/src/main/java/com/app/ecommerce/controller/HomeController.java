@@ -1,6 +1,7 @@
 package com.app.ecommerce.controller;
 
 import com.app.ecommerce.entity.Admin;
+import com.app.ecommerce.entity.Message;
 import com.app.ecommerce.repository.Productrepo;
 import com.app.ecommerce.service.Productservice;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ public class HomeController {
 
     @GetMapping("/products")
     public String productpage( Model model ){
-        model.addAttribute("ProductList",productservice.getAllproduct());
-        return "ProductPage";
+        model.addAttribute("productList",productservice.getAllproduct());
+        return "Products";
     }
 
     @GetMapping("/contact")
@@ -39,5 +40,11 @@ public class HomeController {
     public String login(Model model){
         model.addAttribute("admin",new Admin());
         return "Login";
+    }
+
+    @GetMapping("/contactus")
+    public String contactpage(Model model){
+        model.addAttribute("message",new Message());
+        return "contactpage";
     }
 }

@@ -17,11 +17,6 @@ public class UserControllerr {
     @Autowired
     private Userservice userservice;
 
-    @GetMapping("/add/user")
-    public String adduser(){
-        return "addUser";
-    }
-
     @PostMapping("/add/user")
     public String adduser(User user){
         userservice.createuser(user);
@@ -37,12 +32,12 @@ public class UserControllerr {
     @PostMapping("/update/user")
     public String updateuser(User user){
         userservice.createuser(user);
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
 
-    @DeleteMapping("/delete/user/{id}")
+    @GetMapping("/delete/user/{id}")
     public String deleteuser(@PathVariable Long id,User user){
         userservice.deleteuser(user,id);
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
 }

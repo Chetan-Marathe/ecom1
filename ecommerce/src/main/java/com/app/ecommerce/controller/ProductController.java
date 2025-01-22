@@ -16,15 +16,10 @@ public class ProductController {
     @Autowired
     private Productservice productservice;
 
-    @GetMapping("/add/product")
-    public String addproduct(){
-        return "AddProduct";
-    }
-
     @PostMapping("/add/product")
     public String addproduct(Product product){
         productservice.createproduct(product);
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
     @GetMapping("/update/product/{id}")
     public String updateproduct(@PathVariable Long id,Model model){
@@ -35,13 +30,13 @@ public class ProductController {
     @PostMapping("/update/product")
     public String Updateproduct(Product product){
         productservice.updateproduct(product, product.getId());
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
 
-    @DeleteMapping("/delete/product/{id}")
+    @GetMapping("/delete/product/{id}")
     public String delteproduct(@PathVariable Long id,Product product){
        productservice.deleteproduct(product,id);
-       return "/admin/home";
+       return "redirect:/admin/home";
     }
 
 

@@ -1,6 +1,8 @@
 package com.app.ecommerce.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.*;
 
@@ -12,13 +14,33 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    public Long price;
 
-    public int quantity;
+    @NotNull(message = "Price cannot be null")
+    public double price;
+
+
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private int quantity;
 
     public Date date;
 
-    public  double amount;
+    public double  amount;
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String name;
+
+
 
     //As a user can have many order
     @ManyToOne
@@ -33,7 +55,7 @@ public class Order {
         this.id = id;
     }
 
-    public Long getPrice() {
+    public double getPrice() {
         return price;
     }
 

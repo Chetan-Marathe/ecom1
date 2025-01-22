@@ -8,13 +8,12 @@ import com.app.ecommerce.service.Adminservice;
 import com.app.ecommerce.service.Orderservice;
 import com.app.ecommerce.service.Productservice;
 import com.app.ecommerce.service.Userservice;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Date;
 
@@ -32,12 +31,15 @@ public class Admincontroller {
     @Autowired
     private Productservice productservice;
 
-    private User user;
 
-    @GetMapping("/verifyCredentials")
-    public String verifycredentials(Model model, Admin admin){
+
+    @GetMapping("/admin/verify/credentials")
+    public String verifyCredentials(@ModelAttribute("admin") Admin admin,Model model){
         if (adminservice.verifycredentials(admin.getEmail(),admin.getPassword())) {
-            return "/admin/home";
+            model.addAttribute("admin",new Admin());
+            model.addAttribute("user",new User());
+            model.addAttribute("product",new Product());
+            return "redirect:/admin/home";
         }
         model.addAttribute("error","invalid emial or passwprd");
         return "Login";
@@ -52,68 +54,87 @@ public class Admincontroller {
         return "AdminHomePage";
     }
 
-    @GetMapping("/admin")
-    public String createAdmin(){
-        return "AddAdmin";
-    }
 
     @PostMapping("/add/admin")
     public String createadmin(Admin admin){
         adminservice.createadmin(admin);
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
 
-    @GetMapping("/update/admin/id")
-    public String updateAdmin(@PathVariable Long id,Model model){
+    @GetMapping("/update/admin/{id}")
+    public String update(@PathVariable Long id, Model model){
         model.addAttribute("admin",adminservice.getadminbyid(id));
-
-        return "updateAdmin";
+        return "UpdateAdmin";
     }
 
     @PostMapping("/update/admin")
     public String updateAdmin(Admin admin){
         adminservice.createadmin(admin);
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
 
-    @DeleteMapping("/delete/admin/{id}")
+    @GetMapping("/delete/admin/{id}")
     public String deleteadmin(@PathVariable Long id,Admin admin){
         adminservice.deleteadmin(admin,id);
-        return "/admin/home";
+        return "redirect:/admin/home";
     }
 
-    @GetMapping("/user/login")
-    public String userLogin(User user, Model model){
+    @PostMapping("/user/login")
+    public String userLogin(User user, RedirectAttributes redirectAttributes){
         if (userservice.verifycredentials(user.getEmail(),user.getPassword())){
             user=userservice.findbyemail(user.getEmail());
-            model.addAttribute("orderList",orderservice.findorderbyuser(user));
-            return "ProductPage";
+            redirectAttributes.addAttribute("userId",user.getId());
+            return "redirect:/user/home";
         }
-        model.addAttribute("error","invalid emial or passwprd");
+        redirectAttributes.addAttribute("error","Invalid email or password");
         return "Login";
     }
 
-    @GetMapping("/place/order")
-    public String placeOrder(Order order, Model model){
-        double totalamount = order.getPrice()*order.getQuantity();
-        order.setAmount(totalamount);
-        order.setUser(user);
+    @PostMapping("/place/order")
+    public String placeOrder(Order order, Long userId, RedirectAttributes redirectAttributes) {
+        double totalAmount = order.getPrice() * order.getQuantity();
+        order.setAmount(totalAmount);
         order.setDate(new Date());
+
+        User user = userservice.getuserbyid(userId);
+        order.setUser(user);
+
         orderservice.createorder(order);
-        model.addAttribute("amount",totalamount);
-        return "OrderStatus";
+
+        redirectAttributes.addAttribute("userId", userId);
+        redirectAttributes.addAttribute("messageSuccess", "The order has been placed!!");
+
+        return "redirect:/user/home";
     }
 
-    @GetMapping("/product/search")
-    public String productsearch(String name, Model model){
+
+    @PostMapping("/product/search")
+    public String productsearch(String name, Long userId , Model model){
         Product product = productservice.findbyname(name);
-        if(product!=null){
-            model.addAttribute("orderList",orderservice.findorderbyuser(user));
-            model.addAttribute("product",product);
-            return "Productpage";
-        }
-        model.addAttribute("error","Sorry product not found");
+        User user = userservice.getuserbyid(userId);
         model.addAttribute("orderList",orderservice.findorderbyuser(user));
-        return "ProductPage";
+        if(product!=null){
+            model.addAttribute("product",product);
+        }else{
+            model.addAttribute("messageError","Sorry product not found");
+
+        }
+        model.addAttribute("userId",userId);
+
+        return "BuyProductPage";
     }
+
+    @GetMapping("/user/home")
+    public String userHome(@ModelAttribute("userId") Long userId,Model model,@ModelAttribute("error") String error,@ModelAttribute ("messageSuccess") String messageSuccess) {
+        User user = userservice.getuserbyid(userId);
+        model.addAttribute("orderList", orderservice.findorderbyuser(user));
+        if(!error.isEmpty()){
+            model.addAttribute("error",error);
+        }
+        if(!messageSuccess.isEmpty()){
+            model.addAttribute("messageSuccess",messageSuccess);
+        }
+        return "BuyProductPage";
+    }
+
 }

@@ -10,15 +10,15 @@ public class Admin {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+   public Long id;
 
-   private String name;
+   public String name;
 
-   private String email;
+   public String email;
 
 
    @Value("qwerty")
-   private String password;
+   public String password;
 
     public Long getId() {
         return id;
@@ -60,5 +60,10 @@ public class Admin {
     }
     public Admin(){
 
+    }
+
+    public Admin(String name,String password){
+        this.name=name;
+        this.password=password;
     }
 }

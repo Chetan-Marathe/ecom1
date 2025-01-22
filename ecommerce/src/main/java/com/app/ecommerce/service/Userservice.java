@@ -45,7 +45,7 @@ public class Userservice {
 
     public boolean verifycredentials(String email ,String password){
         User user = userrepo.findByemail(email);
-        if(user.getPassword()==password){
+        if(user.getPassword().equals(password)){
             return true;
         }else{
             return false;

@@ -32,15 +32,17 @@ public class Adminservice {
     }
 
     //We are going to verify if the user rhass the same password as thta in the database
-
-    public boolean verifycredentials(String email ,  String password){
+    public boolean verifycredentials(String email, String password) {
         Admin admin = adminrepo.findByemail(email);
-        if(admin.getPassword()== password){
-            return true;
-        }else{
-            return false;
+
+        // Check if admin is null or the password is null
+        if (admin == null || admin.getPassword() == null) {
+            return false; // Either admin not found or password is null
         }
+
+        return admin.getPassword().equals(password);
     }
+
 
     public void createadmin( Admin admin ){
         adminrepo.save(admin);
